@@ -1,6 +1,61 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+# Criando comandos
+
+def carregar_pets():
+    for item in tree.get_children():
+        tree.delete(item)
+    for pet in pets:
+        tree.insert('', 'end', values=(
+            pet['ID'],
+            pet['Tutor'],
+            pet['Nome'],
+            pet['Espécie'],
+            pet['Raça'],
+            pet['Idade']
+        ))
+    
+
+def adicionar_pet():
+    global next_pet_id
+    Tutor = entry_tutor.get()
+    Nome = entry_nome.get()
+    Espécie = entry_especie.get()
+    Raça = entry_raça.get()
+    Idade = entry_idade.get()
+
+    if not Tutor or not Nome:
+        messagebox.showerror('Erro',
+                         'Tutor e nome do pet são obrigatórios.')
+        return
+    
+    try:
+        idade_int = int(Idade) if Idade else 0
+    except ValueError:
+        messagebox.showerror('Erro',
+                         'Idade deve ser um número inteiro.')
+        return
+        
+    novo_pet = {
+        'ID': next_pet_id,
+        'Tutor': Tutor,
+        'Nome': Nome,
+        'Espécie': Espécie,
+        'Raça': Raça,
+        'Idade': idade_int,
+    }    
+
+    pets.append(novo_pet)
+    next_pet_id += 1
+
+    messagebox.showinfo('Sucesso',
+                        'Pet cadastrado com sucesso!')
+    
+    
+    carregar_pets()
+    
+
 # Dados em memória 
 pets = []
 next_pet_id = 1 
@@ -79,7 +134,7 @@ frame_botoes.pack(pady=5)
 
 btn_adicionar = ttk.Button(frame_botoes,
                            text='Adicionar',
-                           command=None)
+                           command=adicionar_pet)
 btn_adicionar.grid(row=0, column=1, padx=5)
 
 
@@ -116,8 +171,23 @@ tree.heading('Raça', text='Raça')
 tree.heading('Idade', text='Idade')
 
 
+tree.column('ID', width=50)
+tree.column('Tutor', width=150)
+tree.column('Nome', width=100)
+tree.column('Espécie', width=100)
+tree.column('Raça', width=100)
+tree.column('Idade', width=50)
 
 
+scrollbar = ttk.Scrollbar(frame_tabela,
+                          orient='vertical',
+                          command=tree.yview)
+tree.configure(yscrollcommand=scrollbar.set)
 
+tree.pack(side='left', fill='both',
+          expand=True)
+scrollbar.pack(side='right', fill='y')
+
+tree.bind('<<TreeviewSelect>>', None)
 
 root.mainloop()
