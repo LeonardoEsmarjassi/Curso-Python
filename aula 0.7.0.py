@@ -1,6 +1,37 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
-import json
+import json 
+
+def carregar_de_json():
+    global pets, next_pet_id
+    
+    arquivo = filedialog.askopenfilename(
+        filetypes=[("Arquivos JSON", "*.json")],
+        title="Selecionar arquivo JSON para carregar"
+    )
+    
+    if not arquivo:  # Se o usuário cancelar
+        return
+    
+    try:
+        with open(arquivo, 'r', encoding='utf-8') as f:
+            pets_carregados = json.load(f)
+        
+        # Atualiza a lista de pets e o próximo ID
+        pets = pets_carregados
+        if pets:
+            next_pet_id=max(pet['id'] for pet in pets)+1
+        else:
+            next_pet_id = 1
+            
+        carregar_pets()
+        messagebox.showinfo("Sucesso", 
+           f"Dados carregados com sucesso de:\n{arquivo}")
+    except Exception as e:
+        messagebox.showerror("Erro", 
+            f"Ocorreu um erro ao carregar:\n{str(e)}")
+
+
 
 def salvar_para_json():
     if not pets:
@@ -19,26 +50,27 @@ def salvar_para_json():
     
     try:
         with open(arquivo, 'w', encoding='utf-8') as f:
-            json.dump(pets, f, ensure_ascii=False, indent=4)
+            json.dump(pets, f, ensure_ascii=False, 
+                      indent=4)
         messagebox.showinfo("Sucesso", f"Dados salvos com sucesso em:\n{arquivo}")
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro ao salvar:\n{str(e)}")
-            
 
-def carregar_pets(pets_list=None):
+
+
+def carregar_pets():
     for item in tree.get_children():
         tree.delete(item)
 
-    pets_to_load = pets_list if pets_list is not None else pets
-
-    for pet in pets_to_load:
+    for pet in pets:
         tree.insert('', 'end', values=(
-            pet['id'], 
-            pet['tutor'], 
-            pet['nome'], 
-            pet['especie'], 
-            pet['raca'], 
-            pet['idade']))    
+            pet['id'],
+            pet['tutor'],
+            pet['nome'],
+            pet['especie'],
+            pet['raca'],
+            pet['idade']
+        ))
 
 def adicionar_pet():
     global next_pet_id
@@ -158,26 +190,24 @@ def remover_pet():
         limpar_campos()
         carregar_pets()
 
-
 def pesquisar_por_tutor():
-    termo_pesquisar = entry_tutor.get().lower()
-
-    if not termo_pesquisar:
+    termo_pesquisa = entry_tutor.get().lower()
+    
+    if not termo_pesquisa:
         carregar_pets()
-
         return
     
-    pets_encontrados = [pet for pet in pets
-                        if termo_pesquisar in pet['tutor'].lower()]
+    pets_encontrados = [pet for pet in pets 
+        if termo_pesquisa in pet['tutor'].lower()]
     
     if not pets_encontrados:
-        messagebox.showinfo('Pesquisa',
-            'Nenhum pet encontrado com esse tutor.')
+        messagebox.showinfo("Pesquisa", 
+                "Nenhum pet encontrado para este tutor.")
         carregar_pets()
     else:
         carregar_pets(pets_encontrados)
-                            
-                            
+
+
 
 
 # Dados em memória
@@ -259,24 +289,31 @@ btn_adicionar = ttk.Button(frame_botoes,
 btn_adicionar.grid(row=0, column=0, padx=5)
 
 btn_editar = ttk.Button(frame_botoes, 
-        text="Editar", command=None)
+        text="Editar", command=editar_pet)
 btn_editar.grid(row=0, column=1, padx=5)
 
 btn_remover = ttk.Button(frame_botoes, 
-        text="Remover", command=None)
+        text="Remover", command=remover_pet)
 btn_remover.grid(row=0, column=2, padx=5)
+
 
 btn_limpar = ttk.Button(frame_botoes, 
         text="Limpar", command=limpar_campos)
 btn_limpar.grid(row=0, column=3, padx=5)
 
 btn_pesquisar = ttk.Button(frame_botoes,
-        text="Pesquisar", command=pesquisar_por_tutor)
+        text="Pesquisar Tutor", command=pesquisar_por_tutor)
 btn_pesquisar.grid(row=0, column=4, padx=5)
 
 btn_salvar_json = ttk.Button(frame_botoes,
-        text="Salvar Arquivo", command=salvar_para_json)      
-btn_salvar_json.grid(row=0, column=5, padx=5)                     
+        text="Salvar Json",command=salvar_para_json)
+btn_salvar_json.grid(row=0, column=5, padx=5)
+
+btn_carregar_json = ttk.Button(frame_botoes,
+        text="Carregar Json",command=carregar_de_json)
+btn_carregar_json.grid(row=0, column=6, padx=5)
+
+
 
 # Tabela de pets
 frame_tabela = ttk.Frame(root)
