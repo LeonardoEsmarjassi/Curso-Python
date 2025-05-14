@@ -35,11 +35,11 @@ def criar_cadastro(data, cliente, telefone, placa, marca, modelo, ano, cor, km, 
 
 def cadastro_veiculo():
     st.title('Cadastrar Veículo para Manutenção')
-    st.write('Digite os dados do veiculo e do proprietário.')
+    st.write('Digite os dados do Veículo e do proprietário.')
     data_minima = datetime.date(1900,1,1)
     data_maxima = datetime.date(2100,1, 1)
 
-    data = st.date_input('Data do cadastro?', format='DD/MM/YYYY',min_value=data_minima, max_value=data_maxima)
+    data = st.date_input('Data do cadastro ?', format='DD/MM/YYYY',min_value=data_minima, max_value=data_maxima)
     cliente = st.text_input('Nome do cliente que veio com o veículo?')
     telefone = st.text_input('Telefone do cliente?')
     placa = st.text_input('Qual a placa do veículo ?')
@@ -61,7 +61,7 @@ def cadastro_veiculo():
 
 def lista_veiculos():
     st.title('Lista de Veículos Cadastrados')
-    st.write('Aqui estão os veículos cadastrados:')
+    st.write('Aqui estão os Veículos cadastrados:')
 
     veiculos = carregar_veiculos()
 
@@ -84,8 +84,8 @@ def lista_veiculos():
 
 def consultar_veiculo():
     st.title('Consultar Veículos Cadastrados')
-    st.write('Digite a placa do veículo para consulta.')
-    placa_consulta = st.text_input('Placa do veículo:').upper()
+    st.write('Digite a placa do Veículo para consulta.')
+    placa_consulta = st.text_input('Placa do Veículo:').upper()
 
     veiculos = carregar_veiculos()
     if placa_consulta:
@@ -103,7 +103,7 @@ def editar_veiculo():
     st.title('Editar Veículo Cadastrado')
     st.write('Digite a placa do veículo que deseja editar.')
 
-    placa_editar = st.text_input('Placa do veículo:').upper()
+    placa_editar = st.text_input('Placa do Veículo:').upper()
     veiculos = carregar_veiculos()
 
     if placa_editar and placa_editar in veiculos:
@@ -137,7 +137,7 @@ def excluir_veiculo():
     st.title('Excluir Veículo Cadastrado')
     st.write('Digite a placa do veículo que deseja excluir.')
 
-    placa_excluir = st.text_input('Placa do veículo:').upper()
+    placa_excluir = st.text_input('Placa do Veículo:').upper()
     veiculos = carregar_veiculos()
 
     if placa_excluir and placa_excluir in veiculos:
