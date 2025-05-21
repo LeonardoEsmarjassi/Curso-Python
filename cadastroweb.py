@@ -3,22 +3,18 @@ import datetime
 import os
 import json
 
-# Nome do arquivo onde os dados dos veículos serão armazenados em formato JSON
 arquivos_salvos = 'veiculos_json'
 
-# Função para carregar os veículos salvos no arquivo JSON
 def carregar_veiculos():
     if os.path.exists(arquivos_salvos):
         with open(arquivos_salvos, 'r', encoding='utf-8') as f:
-            return json.load(f)  # Retorna o dicionário de veículos
-    return {}  # Se o arquivo não existir, retorna um dicionário vazio
+            return json.load(f)
+    return {}
 
-# Função para salvar os dados dos veículos no arquivo JSON
 def salvar_veiculos(veiculos):
     with open(arquivos_salvos, 'w', encoding='utf-8') as f:
-        json.dump(veiculos, f, ensure_ascii=False, indent=4)  # Salva formatado com identação
+        json.dump(veiculos, f, ensure_ascii=False, indent=4)
 
-# Função que cria o dicionário com os dados do veículo
 def criar_cadastro(data, cliente, telefone, placa, marca, modelo, ano, cor, km, resolver):
     return {
         'data': data,
@@ -33,48 +29,42 @@ def criar_cadastro(data, cliente, telefone, placa, marca, modelo, ano, cor, km, 
         'resolver': resolver
     }
 
-# Função principal para cadastrar um novo veículo
 def cadastro_veiculo():
-    st.title('Cadastrar Veículo para Manutenção')  # Título da página
-    st.write('Digite os dados do Veículo e do proprietário.')  # Instrução ao usuário
-    
-    # Define limites para a data
+    st.title('📋 Cadastro de Veículo para Manutenção')
+    st.markdown('Preencha os dados abaixo para registrar um novo veículo. 🚘')
+
     data_minima = datetime.date(1900,1,1)
     data_maxima = datetime.date(2100,1,1)
 
-    # Campos de entrada
-    data = st.date_input('Data do cadastro ?', format='DD/MM/YYYY', min_value=data_minima, max_value=data_maxima)
-    cliente = st.text_input('Nome do cliente que veio com o veículo?')
-    telefone = st.text_input('Telefone do cliente?')
-    placa = st.text_input('Qual a placa do veículo ?')
-    marca = st.text_input('Qual a marca do veículo ?')
-    modelo = st.text_input('Qual o modelo do veículo ?')
-    ano = st.number_input('Ano do veículo?', step=1, value=0, format='%d')
-    cor = st.text_input('Qual a cor do veículo ?')
-    km = st.number_input('Qual a quilometragem do veículo?', step=1, value=0, format='%d')
-    resolver = st.text_area('Descreva o problema do veículo e o que deseja resolver:')
+    data = st.date_input('📅 Data do cadastro:', format='DD/MM/YYYY', min_value=data_minima, max_value=data_maxima)
+    cliente = st.text_input('👤 Nome do cliente:')
+    telefone = st.text_input('📞 Telefone para contato:')
+    placa = st.text_input('🔤 Placa do veículo:')
+    marca = st.text_input('🏷️ Marca:')
+    modelo = st.text_input('📍 Modelo:')
+    ano = st.number_input('📆 Ano do veículo:', step=1, value=0, format='%d')
+    cor = st.text_input('🎨 Cor:')
+    km = st.number_input('📊 Quilometragem:', step=1, value=0, format='%d')
+    resolver = st.text_area('🛠️ Descreva o problema ou serviço desejado:')
 
-    # Botão para cadastrar
-    if st.button('Cadastrar'):
-        veiculos = carregar_veiculos()  # Carrega veículos já cadastrados
+    if st.button('✅ Cadastrar'):
+        veiculos = carregar_veiculos()
         veiculo = criar_cadastro(str(data), cliente, telefone, placa.upper(), marca, modelo, ano, cor, km, resolver)
-        veiculos[placa.upper()] = veiculo  # Usa a placa (em maiúsculo) como chave
-        salvar_veiculos(veiculos)  # Salva os dados
+        veiculos[placa.upper()] = veiculo
+        salvar_veiculos(veiculos)
 
-        st.success('Veículo cadastrado com sucesso!')
-        st.write(f'{data} - {cliente} - {telefone} - {placa} - {marca} - {modelo} - {ano} - {cor} - {km} - {resolver}')
+        st.success('🎉 Veículo cadastrado com sucesso!')
+        st.write(f'**Resumo:**\n{data} | {cliente} | {telefone} | {placa} | {marca} | {modelo} | {ano} | {cor} | {km} | {resolver}')
 
-# Função para listar todos os veículos cadastrados
 def lista_veiculos():
-    st.title('Lista de Veículos Cadastrados')
-    st.write('Aqui estão os Veículos cadastrados:')
+    st.title('📑 Lista de Veículos Cadastrados')
+    st.markdown('Veja abaixo todos os veículos já registrados na oficina. 🛠️')
 
-    veiculos = carregar_veiculos()  # Carrega os dados
+    veiculos = carregar_veiculos()
 
-    # Se houver veículos cadastrados, exibe cada um
     if veiculos:
         for placa, veiculo in veiculos.items():
-            with st.expander(f"Placa: {placa} | Cliente: {veiculo['cliente']}"):
+            with st.expander(f"📌 {placa} | Cliente: {veiculo['cliente']}"):
                 st.write(f"📅 Data: {veiculo['data']}")
                 st.write(f"📞 Telefone: {veiculo['telefone']}")
                 st.write(f"🚗 Marca: {veiculo['marca']}")
@@ -84,115 +74,107 @@ def lista_veiculos():
                 st.write(f"📊 KM: {veiculo['km']}")
                 st.write(f"🛠️ Problema: {veiculo['resolver']}")
     else:
-        st.info('Nenhum veículo cadastrado até o momento.')
+        st.info('🚫 Nenhum veículo cadastrado ainda.')
 
-# Função para consultar um veículo pela placa
 def consultar_veiculo():
-    st.title('Consultar Veículos Cadastrados')
-    st.write('Digite a placa do Veículo para consulta.')
-    placa_consulta = st.text_input('Placa do Veículo:').upper()
+    st.title('🔍 Consultar Veículo')
+    st.markdown('Digite a **placa do veículo** ao lado para visualizar os dados.')
 
+    placa_consulta = st.sidebar.text_input('🔎 Placa:').upper()
     veiculos = carregar_veiculos()
+
     if placa_consulta:
         if placa_consulta in veiculos:
             veiculo = veiculos[placa_consulta]
-            # Exibe os dados encontrados
-            st.write(f"Data: {veiculo['data']}, Cliente: {veiculo['cliente']}, Telefone: {veiculo['telefone']}, Placa: {veiculo['placa']}, Marca: {veiculo['marca']}, Modelo: {veiculo['modelo']}, Ano: {veiculo['ano']}, Cor: {veiculo['cor']}, KM: {veiculo['km']}, Resolver: {veiculo['resolver']}")
+            st.success('✅ Veículo encontrado!')
+            st.write(f"📅 Data: {veiculo['data']}")
+            st.write(f"👤 Cliente: {veiculo['cliente']}")
+            st.write(f"📞 Telefone: {veiculo['telefone']}")
+            st.write(f"🚗 Marca: {veiculo['marca']}")
+            st.write(f"📍 Modelo: {veiculo['modelo']}")
+            st.write(f"🔢 Ano: {veiculo['ano']}")
+            st.write(f"🎨 Cor: {veiculo['cor']}")
+            st.write(f"📊 KM: {veiculo['km']}")
+            st.write(f"🛠️ Problema: {veiculo['resolver']}")
         else:
-            st.warning('Veículo não encontrado.')
+            st.warning('⚠️ Veículo não encontrado.')
     else:
-        st.info('Digite uma placa para consultar.')
+        st.info('💡 Dica: digite a placa ao lado para iniciar a consulta.')
 
-# Função para editar os dados de um veículo
 def editar_veiculo():
-    st.title('Editar Veículo Cadastrado')
-    st.write('Digite a placa do veículo que deseja editar.')
+    st.title('✏️ Editar Veículo')
+    st.markdown('Digite a **placa** ao lado para alterar os dados do veículo.')
 
-    placa_editar = st.text_input('Placa do Veículo:').upper()
+    placa_editar = st.sidebar.text_input('🔤 Placa:').upper()
     veiculos = carregar_veiculos()
 
     if placa_editar and placa_editar in veiculos:
         veiculo = veiculos[placa_editar]
+        st.success('🟢 Veículo localizado! Altere os dados ao lado.')
 
-        st.success('Veículo encontrado. Edite os dados abaixo.')
+        data = st.sidebar.date_input('📅 Data do cadastro:', value=datetime.datetime.strptime(veiculo['data'], "%Y-%m-%d").date())
+        cliente = st.sidebar.text_input('👤 Nome do cliente:', value=veiculo['cliente'])
+        telefone = st.sidebar.text_input('📞 Telefone:', value=veiculo['telefone'])
+        marca = st.sidebar.text_input('🏷️ Marca:', value=veiculo['marca'])
+        modelo = st.sidebar.text_input('📍 Modelo:', value=veiculo['modelo'])
+        ano = st.sidebar.number_input('📆 Ano:', value=int(veiculo['ano']), step=1, format='%d')
+        cor = st.sidebar.text_input('🎨 Cor:', value=veiculo['cor'])
+        km = st.sidebar.number_input('📊 Quilometragem:', value=int(veiculo['km']), step=1, format='%d')
+        resolver = st.sidebar.text_area('🛠️ Serviço a realizar:', value=veiculo['resolver'])
 
-        # Campos preenchidos com os dados já existentes
-        data = st.date_input('Data do cadastro', value=datetime.datetime.strptime(veiculo['data'], "%Y-%m-%d").date())
-        cliente = st.text_input('Nome do cliente', value=veiculo['cliente'])
-        telefone = st.text_input('Telefone do cliente', value=veiculo['telefone'])
-        marca = st.text_input('Marca do veículo', value=veiculo['marca'])
-        modelo = st.text_input('Modelo do veículo', value=veiculo['modelo'])
-        ano = st.number_input('Ano do veículo', value=int(veiculo['ano']), step=1, format='%d')
-        cor = st.text_input('Cor do veículo', value=veiculo['cor'])
-        km = st.number_input('Quilometragem do veículo', value=int(veiculo['km']), step=1, format='%d')
-        resolver = st.text_area('Problema / Serviço a resolver', value=veiculo['resolver'])
-
-        if st.button('Salvar alterações'):
-            # Atualiza os dados
-            veiculos[placa_editar] = criar_cadastro(
-                str(data), cliente, telefone, placa_editar, marca, modelo, ano, cor, km, resolver
-            )
-            salvar_veiculos(veiculos)  # Salva os dados atualizados
-            st.success('Dados do veículo atualizados com sucesso!')
+        if st.sidebar.button('💾 Salvar alterações'):
+            veiculos[placa_editar] = criar_cadastro(str(data), cliente, telefone, placa_editar, marca, modelo, ano, cor, km, resolver)
+            salvar_veiculos(veiculos)
+            st.success('✅ Dados atualizados com sucesso!')
     elif placa_editar:
-        st.warning('Veículo não encontrado.')
+        st.warning('🚫 Veículo não encontrado.')
 
-# Função para excluir um veículo cadastrado
 def excluir_veiculo():
-    st.title('Excluir Veículo Cadastrado')
-    st.write('Digite a placa do veículo que deseja excluir.')
+    st.title('🗑️ Excluir Veículo')
+    st.markdown('Digite a **placa** ao lado para remover o veículo do sistema.')
 
-    placa_excluir = st.text_input('Placa do Veículo:').upper()
+    placa_excluir = st.sidebar.text_input('🔤 Placa:').upper()
     veiculos = carregar_veiculos()
 
     if placa_excluir and placa_excluir in veiculos:
         veiculo = veiculos[placa_excluir]
+        st.warning('⚠️ Atenção! Os dados abaixo serão excluídos:')
+        st.write(f"📅 Data: {veiculo['data']}")
+        st.write(f"👤 Cliente: {veiculo['cliente']}")
+        st.write(f"📞 Telefone: {veiculo['telefone']}")
+        st.write(f"🚗 Marca: {veiculo['marca']}")
+        st.write(f"📍 Modelo: {veiculo['modelo']}")
+        st.write(f"🔢 Ano: {veiculo['ano']}")
+        st.write(f"🎨 Cor: {veiculo['cor']}")
+        st.write(f"📊 KM: {veiculo['km']}")
+        st.write(f"🛠️ Problema: {veiculo['resolver']}")
 
-        # Mostra os dados do veículo antes de excluir
-        st.warning('Atenção! Este veículo será excluído:')
-        st.write(f"Data: {veiculo['data']}")
-        st.write(f"Cliente: {veiculo['cliente']}")
-        st.write(f"Telefone: {veiculo['telefone']}")
-        st.write(f"Placa: {veiculo['placa']}")
-        st.write(f"Marca: {veiculo['marca']}")
-        st.write(f"Modelo: {veiculo['modelo']}")
-        st.write(f"Ano: {veiculo['ano']}")
-        st.write(f"Cor: {veiculo['cor']}")
-        st.write(f"KM: {veiculo['km']}")
-        st.write(f"Resolver: {veiculo['resolver']}")
-
-        # Botão de confirmação da exclusão
-        if st.button('Confirmar exclusão'):
-            del veiculos[placa_excluir]  # Remove o veículo do dicionário
-            salvar_veiculos(veiculos)  # Salva os dados
-            st.success('Veículo excluído com sucesso!')
+        if st.sidebar.button('✅ Confirmar exclusão'):
+            del veiculos[placa_excluir]
+            salvar_veiculos(veiculos)
+            st.success('🗑️ Veículo excluído com sucesso!')
     elif placa_excluir:
-        st.warning('Veículo não encontrado.')
+        st.warning('🚫 Veículo não encontrado.')
 
-# Menu lateral com as opções
-st.sidebar.title('Menu')
+# MENU LATERAL
+st.sidebar.title('📚 Menu da Oficina')
 opcao = st.sidebar.radio(
-    'Selecione uma opção',
-    ('Cadastrar Veículo', 'Consultar Veículo','Lista de Veículos', 'Editar Veículo', 'Excluir Veículo',)
+    '🚦 Selecione uma opção:',
+    ('Cadastrar Veículo', 'Consultar Veículo', 'Lista de Veículos', 'Editar Veículo', 'Excluir Veículo')
 )
 
-# Executa a função escolhida no menu
 if opcao == 'Cadastrar Veículo':
     cadastro_veiculo()
-
 elif opcao == 'Consultar Veículo':
     consultar_veiculo()
-
 elif opcao == 'Lista de Veículos':
     lista_veiculos()
-
 elif opcao == 'Editar Veículo':
     editar_veiculo()
-
 elif opcao == 'Excluir Veículo':
-    excluir_veiculo()            
+    excluir_veiculo()
 
-# Rodapé do menu lateral
 st.sidebar.markdown('---')
-st.sidebar.markdown('Desenvolvido por Leonardo Esmarjassi')
-st.sidebar.markdown('Versão 1.0')
+st.sidebar.markdown('👨‍💻 Desenvolvido por **Leonardo Esmarjassi**')
+st.sidebar.markdown('📦 Versão 1.0')
+st.sidebar.markdown(f'Total de veículos cadastrados: {len(carregar_veiculos())}')
